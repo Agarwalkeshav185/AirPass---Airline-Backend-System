@@ -24,6 +24,7 @@ module.exports = {
         values: ['InProcess', 'Booked', 'Cancelled'],
         defaultValue:'InProcess'
       },
+      
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
