@@ -1,14 +1,17 @@
 const express = require('express');
 const { BookingController } = require('../../controllers/index');
-const { createChannel } = require('../../utils/mesageQueue');
+const { createChannel } = require('../../utils/messageQueue');
 
-const router = express.Router();
+async function createRouter() {
+    const router = express.Router();
+    try {
+        const channel = await createChannel();
+        const bookingController = new BookingController(channel);
+        router.post('/bookings', bookingController.create);
+    } catch (err) {
+        console.error('Error initializing booking routes:', err);
+    }
+    return router;
+}
 
-
-// const channel = await createChannel();
-const bookingController = new BookingController();
-
-router.post('/bookings', bookingController.create);
-router.post('/publish', bookingController.sendMessageToQueue);
-
-module.exports = router;
+module.exports = createRouter();

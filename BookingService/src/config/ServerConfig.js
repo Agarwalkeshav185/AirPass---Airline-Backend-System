@@ -9,5 +9,6 @@ module.exports = {
     MESSAGE_BROKER_URL : process.env.MESSAGE_BROKER_URL,
     EXCHANGE_NAME : process.env.EXCHANGE_NAME,
     REMINDER_BINDING_KEY : process.env.REMINDER_BINDING_KEY,
-    REMINDER_QUEUE : process.env.QUEUE_NAME
+    REMINDER_QUEUE : process.env.QUEUE_NAME,
+    USER_SERVICE_PATH : process.env.USER_SERVICE_PATH
 }

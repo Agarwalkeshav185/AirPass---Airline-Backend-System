@@ -1,13 +1,15 @@
 const {BookingService} = require('../services/index');
 const {StatusCodes} = require('http-status-codes');
-const bookingService = new BookingService();
+
 
 const { createChannel, publishMessage } = require('../utils/mesageQueue');
 const { REMINDER_BINDING_KEY } = require('../config/serverConfig');
+
 class BookingController {
-    // constructor(channel){
-    //     this.channel = channel;
-    // }
+    constructor(channel){
+        this.channel = channel;
+        this.bookingService = new BookingService(channel);
+    }
     async sendMessageToQueue(req, res){
         try {
             const channel = await createChannel();
