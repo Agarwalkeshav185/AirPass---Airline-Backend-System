@@ -1,7 +1,7 @@
 const axios = require('axios');
 const {BookingRepository} = require('../repository/index');
 const {ServiceError} = require('../utils/errors/index');
-const {FLIGHT_SERVICE_PATH} = require('../config/ServerConfig');
+const {FLIGHT_SERVICE_PATH} = require('../config/serverConfig');
 
 class BookingService{
     constructor(){
@@ -28,6 +28,7 @@ class BookingService{
             console.log(updateFlightRequestURL);
             await axios.patch(updateFlightRequestURL, {totalSeats : flightData.totalSeats - booking.noOfSeats });
             const finalBooking = await this.bookingRepository.update(booking.id, {status:'Booked'});
+
             return finalBooking;
         } catch (error) {
             console.log(error);
