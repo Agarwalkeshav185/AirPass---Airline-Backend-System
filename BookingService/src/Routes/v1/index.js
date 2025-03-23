@@ -1,6 +1,6 @@
 const express = require('express');
 const { BookingController } = require('../../controllers/index');
-// const { createChannel } = require('../../utils/mesageQueue');
+const { createChannel } = require('../../utils/mesageQueue');
 
 const router = express.Router();
 
