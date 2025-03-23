@@ -14,12 +14,14 @@ const createChannel = async () =>{
 
 const subscribeMessage = async (channel , service, binding_key) =>{
     try {
-        const applicationQueue = await channel.assertQueue('QUEUE_NAME');
+        const applicationQueue = await channel.assertQueue('REMINDER_QUEUE');
 
         channel.bindQueue(applicationQueue.queue, EXCHANGE_NAME, binding_key);
         channel.consume(applicationQueue.queue, (msg) =>{
             console.log('Received data');
             console.log(msg.content.toString());
+            const payload = JSON.parse(msg.content.toString());
+            service(payload);
             channel.ack(msg);
         });
     } catch (error) {
