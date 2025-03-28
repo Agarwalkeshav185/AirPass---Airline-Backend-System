@@ -2,6 +2,7 @@ const UserRepository = require('../repository/user-repository');
 const jwt = require('jsonwebtoken');
 const {JWT_KEY} = require('../config/serverConfig');
 const bcrypt = require('bcrypt');
+
 const ClientError = require('../utils/Client-error');
 
 
@@ -10,7 +11,7 @@ class UserService{
         this.UserRepository = new UserRepository();
     }
 
-    async create(data){
+    create = async (data) =>{
         try {
             const user = await this.UserRepository.create(data);
             return user;
@@ -23,7 +24,7 @@ class UserService{
         }
     }
 
-    createToken(user){
+    #createToken(user){
         try {
             const result = jwt.sign(user, JWT_KEY, {expiresIn : '1h'});
             return result;
@@ -41,13 +42,13 @@ class UserService{
             // error if user is not present.
             
             // step->2 compare passwords.
-            const passwordMatch = this.checkPassword(plainPassword, user.password);
+            const passwordMatch = this.#checkPassword(plainPassword, user.password);
             if(!passwordMatch) {
                 console.log('Password does not match');
                 throw {error : 'Incorrect password'};
             }
             // step->3 if password match then create jwttoken and then return that token.
-            const newJWT = this.createToken({email : user.email, id : user.id}, JWT_KEY);
+            const newJWT = this.#createToken({email : user.email, id : user.id}, JWT_KEY);
             return newJWT;
         } catch (error) {
             if(error.name == 'AttributeNotFound') throw error;
@@ -56,7 +57,7 @@ class UserService{
         }
     }
 
-    verifyToken(token){
+    #verifyToken(token){
         try {
             const result = jwt.verify(token, JWT_KEY);
             return result;
@@ -66,7 +67,7 @@ class UserService{
         }
     }
 
-    checkPassword(userInputPlainPassword, encryptedPassword){
+    #checkPassword(userInputPlainPassword, encryptedPassword){
         try {
             return bcrypt.compareSync(userInputPlainPassword, encryptedPassword);
         } catch (error) {
@@ -75,9 +76,9 @@ class UserService{
         }
     }
 
-    async isAuthenticated (token){
+    isAuthenticated = async (token) => {
         try {
-            const response = this.verifyToken(token);
+            const response = this.#verifyToken(token);
 
             if(!response){
                 throw {error:'Invalid token'};
@@ -98,7 +99,17 @@ class UserService{
             return this.UserRepository.isAdmin(userId);
         } catch (error) {
             console.log('Something went wrong in the service layer');
-            throw {error};
+            throw error;
+        }
+    }
+
+    async getUser(userId){
+        try {
+            const user = await this.UserRepository.getById(userId);
+            return user;
+        } catch (error) {
+            console.log('Something went wrong in the service layer');
+            throw error;
         }
     }
 }

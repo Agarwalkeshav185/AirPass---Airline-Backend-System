@@ -1,5 +1,7 @@
+const { response } = require('express');
 const { JWT_KEY } = require('../config/serverConfig');
 const UserService = require('../services/user-service');
+const {StatusCodes} = require('http-status-codes');
 
 const userService = new UserService();
 const create = async (req, res) => {
@@ -8,7 +10,7 @@ const create = async (req, res) => {
             email:req.body.email,
             password: req.body.password
         });
-        return res.status(201).json({
+        return res.status(StatusCodes.CREATED).json({
             data : { email : response.email }, 
             success:true,
             message:'Successfully created a new user',
@@ -83,9 +85,30 @@ const isAdmin = async(req, res) =>{
     }
 }
 
+const getDetails = async (req, res) =>{
+    try {
+        const response = await userService.getUser(req.params.userId);
+        console.log(req.params.userId);
+        return res.status(StatusCodes.OK).json({
+            data : response,
+            success : true,
+            message : 'Fetched the details of the user',
+            err : {}
+        });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            data: {},
+            message : 'Unable to fetch the details of the user',
+            success : false,
+            err : error
+        });
+    }
+}
+
 module.exports = {
     create,
     signIn,
     isAuthenticated,
-    isAdmin
+    isAdmin,
+    getDetails
 }

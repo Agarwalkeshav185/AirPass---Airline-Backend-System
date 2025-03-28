@@ -13,7 +13,7 @@ const setupAndStartServer = async()=>{
         extended:true
     }));
 
-    app.use('/api', ApiRoutes);
+    app.use('/flightservice/api', ApiRoutes);
 
     app.listen(PORT, async ()=>{
         console.log(`Server started at ${PORT}`);

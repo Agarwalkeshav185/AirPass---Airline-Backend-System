@@ -7,7 +7,6 @@ const sender = nodemailer.createTransport({
         user : EMAIL_ID,
         pass : EMAIL_PASSWORD
     }
-    
 });
 
 module.exports = sender;
