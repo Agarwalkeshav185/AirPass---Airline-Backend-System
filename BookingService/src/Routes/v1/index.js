@@ -10,7 +10,6 @@ const router = express.Router();
         const bookingController = new BookingController(channel);
         router.post('/bookings', bookingController.create);
         router.get('/info', (req, res)=>{
-            console.log('hello');
             return res.status(200).json({
                 message : 'Response from router'
             })
