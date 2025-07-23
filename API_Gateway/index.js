@@ -3,9 +3,13 @@ const morgan = require('morgan');
 const axios = require('axios');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const dotenv = require('dotenv');
-dotenv.config();
 const rateLimit = require('express-rate-limit');
+
+dotenv.config();
+
 const PORT = process.env.PORT;
+const Auth_SERVICE_URL = process.env.AUTH_SERVICE_URL;
+const BOOKING_SERVICE_URL = process.env.BOOKING_SERVICE_URL;
 
 // Creating an express app here.
 const app = express();
@@ -22,8 +26,8 @@ app.use(limiter);
 
 app.use('/bookingservice', async (req, res, next) =>{
     try {
-        // const authRequestURL = `${}/authservice/api/v1/${}`;
-        const response = await axios.get('http://localhost:3001/authservice/api/v1/isauthenticated', {
+        const authRequestURL = `${Auth_SERVICE_URL}/authservice/api/v1/isauthenticated`;
+        const response = await axios.get(authRequestURL, {
             headers:{
                 'x-access-token' : req.headers['x-access-token']
             }
@@ -44,7 +48,7 @@ app.use('/bookingservice', async (req, res, next) =>{
 });
 
 // Rerouting the requests to the different microservices
-app.use('/bookingservice', createProxyMiddleware( {target : 'http://localhost:3002/bookingservice', changeOrigin: true }));
+app.use('/bookingservice', createProxyMiddleware( {target : `${BOOKING_SERVICE_URL}/bookingservice`, changeOrigin: true }));
 
 // Starting the requests listening to the server
 app.listen(PORT , ()=>{
