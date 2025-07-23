@@ -2,8 +2,10 @@ const express = require('express');
 const morgan = require('morgan');
 const axios = require('axios');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const dotenv = require('dotenv');
+dotenv.config();
 const rateLimit = require('express-rate-limit');
-const PORT = 3005;
+const PORT = process.env.PORT;
 
 // Creating an express app here.
 const app = express();
@@ -26,7 +28,7 @@ app.use('/bookingservice', async (req, res, next) =>{
                 'x-access-token' : req.headers['x-access-token']
             }
         });
-        console.log(response.data);
+        // console.log(response.data); // it is for debugging purpose
         if(response.data.success) next();
         else {
             return res.status(401).json({
