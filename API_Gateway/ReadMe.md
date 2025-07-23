@@ -1,5 +1,5 @@
 
-# API Gateway
+## API Gateway
 
 The **API Gateway** is the single entry point for all client requests in the AirPass microservices architecture. It handles routing, authentication, request validation, and aggregation for backend services.
 
@@ -11,16 +11,10 @@ The **API Gateway** is the single entry point for all client requests in the Air
 - Request/response logging with Morgan
 - Proxying requests to appropriate services
 
-## Prerequisites
-
-- Node.js (v14+)
-- npm
-
-
 ## Configuration
 
 - The default port is set to PORT with the help of environment variable (see `index.js`).
-- Ensure the URLs for AuthService and BookingService in `index.js` match the actual running ports of those services.
+- Ensure the base URLs for AuthService and BookingService are set correctly in your `.env` file, and that your code loads them from environment variables.
 - Set up any required environment variables in a `.env` file or in your configuration files.
 
 ## Running the API Gateway
@@ -51,4 +45,4 @@ The server will start on the configured port (default: `http://localhost:3005`).
 
 - **401 Unauthorized:** Ensure you are sending a valid `x-access-token` header.
 - **Connection errors:** Make sure AuthService and BookingService are running and accessible at the URLs specified in `index.js`.
-- **Port conflicts:** Change the `PORT` variable in `index.js` if the default port is in use.
+- **Port conflicts:** Change the `PORT` variable in '.env' if the default port is in use.
