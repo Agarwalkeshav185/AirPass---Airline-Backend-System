@@ -41,7 +41,7 @@ Each service contains its own source code, configuration, models, controllers, r
 ### Prerequisites
 
 - Node.js (v14+)
-- npm or yarn
+- npm
 - Database (PostgreSQL/MySQL)
 - RabbitMQ (for message queue communication)
 
