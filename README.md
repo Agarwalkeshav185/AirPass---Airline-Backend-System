@@ -64,7 +64,28 @@ Each service contains its own source code, configuration, models, controllers, r
 
 3. Set up environment variables and configuration files for each service (see respective `config/` folders).
 
-4. Run database migrations and seeders for each service as needed.
+
+4. Run database migrations and seeders for each service as needed. For services using Sequelize, complete the following steps for database setup:
+   - Inside the `src/config` folder of every service (except Api_Gateway), create a new file `config.json` and add the following JSON:
+
+     ```
+     {
+         "development": {
+             "username": "<your_db_username>",
+             "password": "<your_db_password>",
+             "database": "database_development",
+             "host": "127.0.0.1",
+             "dialect": "mysql"
+         }
+     }
+     ```
+
+   - Once you've added your DB config as listed above, go to the `src` folder from your terminal and execute:
+
+     ```sh
+     npx sequelize db:create
+     npx sequelize db:migrate
+     ```
 
 ### Running the Services
 
