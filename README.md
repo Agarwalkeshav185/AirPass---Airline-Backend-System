@@ -80,7 +80,7 @@ Each service contains its own source code, configuration, models, controllers, r
      }
      ```
 
-   - Once you've added your DB config as listed above, go to the `src` folder from your terminal and execute:
+   - Once you've added your DB config as listed above, go to the `src` folder from your terminal and execute in each service separately except Api_Gateway:
 
      ```sh
      npx sequelize db:create
