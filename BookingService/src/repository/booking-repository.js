@@ -23,20 +23,23 @@ class BookingRepository {
 
     async update(bookingId, data){
         try {
-            // await Booking.update(data,{
-            //     where:{
-            //         id:bookingId
-            //     }
-            // });
-            // return true;
-
             const booking = await Booking.findByPk(bookingId);
-            if(data.status){
-                booking.status = data.status;
+            if(!booking){
+                throw new AppError(
+                    'ResourceNotFound',
+                    'Booking not found',
+                    'No booking found with the provided id',
+                    StatusCodes.NOT_FOUND
+                );
             }
-            if(data.flightId){
-                booking.flightId = data.flightId;
-            }
+
+            Object.keys(data).forEach((key) => {
+                if (key === 'id' || key === 'createdAt' || key === 'updatedAt' || key ==='userId' || key === 'flightId' ) return;
+                if (Object.prototype.hasOwnProperty.call(booking.dataValues, key)) {
+                    booking[key] = data[key];
+                }
+            });
+
             await booking.save();
             return booking;
         } catch (error) {

@@ -104,5 +104,28 @@ class BookingController {
             });
         }
     }
+
+    updateBooking = async (req, res) => {
+        try {
+            const bookingId = req.params.id;
+            const body = req.body;
+            const response = await this.bookingService.updateBooking(bookingId, body);
+            return res.status(StatusCodes.OK).json({
+                data: response,
+                success: true,
+                message: 'Booking updated successfully',
+                err: {}
+            });
+        } catch (error) {
+            console.log('Controller error (updateBooking)');
+            const status = error.statusCode || 500;
+            return res.status(status).json({
+                data: {},
+                success: false,
+                message: error.message || 'Failed to update booking',
+                err: error.explanation || {}
+            });
+        }
+    }
 }
 module.exports = BookingController;
