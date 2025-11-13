@@ -52,9 +52,6 @@ class BookingRepository {
         }
 
     }
-    async destroy(){
-
-    }
 
     async getById(bookingId){
         try {

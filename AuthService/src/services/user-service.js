@@ -1,6 +1,7 @@
 const UserRepository = require('../repository/user-repository');
 const jwt = require('jsonwebtoken');
 const {JWT_KEY} = require('../config/serverConfig');
+const { StatusCodes } = require('http-status-codes');
 const bcrypt = require('bcrypt');
 
 const ClientError = require('../utils/Client-error');
@@ -37,18 +38,19 @@ class UserService{
 
     async signIn(email, plainPassword){
         try {
-            // step->1 fetch user using email.
             const user = await this.UserRepository.getByEmail(email);
-            // error if user is not present.
-            
-            // step->2 compare passwords.
+
             const passwordMatch = this.#checkPassword(plainPassword, user.password);
             if(!passwordMatch) {
                 console.log('Password does not match');
-                throw {error : 'Incorrect password'};
+                throw new ClientError(
+                    'AuthenticationError',
+                    'Invalid Credentials',
+                    'Password does not match',
+                    StatusCodes.BAD_REQUEST
+                );
             }
-            // step->3 if password match then create jwttoken and then return that token.
-            const newJWT = this.#createToken({email : user.email, id : user.id}, JWT_KEY);
+            const newJWT = this.#createToken({email : user.email, id : user.id});
             return newJWT;
         } catch (error) {
             if(error.name == 'AttributeNotFound') throw error;
