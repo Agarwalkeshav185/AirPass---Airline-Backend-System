@@ -148,5 +148,82 @@ class BookingService{
             throw error;
         }
     }
+
+    cancelBooking = async (bookingId) => {
+        try {
+            const booking = await this.bookingRepository.getById(bookingId);
+
+            const cancellableStatuses = ['Booked', 'InProcess'];
+            if (!cancellableStatuses.includes(booking.status)) {
+                throw new ServiceError('Cancellation not allowed', 'Booking status does not permit cancellation');
+            }
+
+            // Try to release seats back to flight (best-effort)
+            const flightId = booking.flightId;
+            const getFlightRequestURL = `${FLIGHT_SERVICE_PATH}/flightservice/api/v1/flights/${flightId}`;
+            try {
+                const flightResponse = await axios.get(getFlightRequestURL);
+                const flightData = flightResponse.data.data;
+                const updateFlightRequestURL = `${FLIGHT_SERVICE_PATH}/flightservice/api/v1/flights/${flightId}`;
+                try {
+                    await axios.patch(updateFlightRequestURL, { totalSeats: flightData.totalSeats + booking.noOfSeats });
+                } catch (err) {
+                    console.log('Warning: failed to release seats back to flight during cancellation', err.message || err);
+                }
+            } catch (err) {
+                console.log('Warning: failed to fetch flight during cancellation', err.message || err);
+            }
+
+            // mark booking cancelled and set refund info (if model supports it)
+            const payload = { status: 'Cancelled' };
+            if (booking.totalCost) {
+                payload.refundAmount = booking.totalCost;
+                payload.refundStatus = 'Pending';
+            }
+
+            const updatedBooking = await this.bookingRepository.update(bookingId, payload);
+
+            // Publish refund and notification events (fire-and-forget)
+            try {
+                const refundPayload = {
+                    data: {
+                        bookingId: updatedBooking.id,
+                        userId: updatedBooking.userId,
+                        amount: updatedBooking.totalCost
+                    },
+                    service: 'PROCESS_REFUND'
+                };
+                publishMessage(this.channel, REMINDER_BINDING_KEY, JSON.stringify(refundPayload));
+
+                // attempt to fetch user email from AuthService to include in notification
+                let userEmail = '';
+                try {
+                    const getUserRequestURL = `${USER_SERVICE_PATH}/authservice/api/v1/user/${updatedBooking.userId}`;
+                    const userResp = await axios.get(getUserRequestURL);
+                    const userData = userResp.data.data;
+                    if (userData && userData.email) userEmail = userData.email;
+                } catch (err) {
+                    console.log('Warning: failed to fetch user for cancellation email', err.message || err);
+                }
+
+                const notifyPayload = {
+                    data: {
+                        subject: 'Booking Cancelled',
+                        recepientEmail: userEmail,
+                        notificationTime: new Date(),
+                        content: `Your booking ${updatedBooking.id} has been cancelled.`
+                    },
+                    service: 'SEND_BASIC_MAIL'
+                };
+                publishMessage(this.channel, REMINDER_BINDING_KEY, JSON.stringify(notifyPayload));
+            } catch (err) {
+                console.log('Warning: failed to publish cancellation events', err.message || err);
+            }
+
+            return updatedBooking;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 module.exports = BookingService;

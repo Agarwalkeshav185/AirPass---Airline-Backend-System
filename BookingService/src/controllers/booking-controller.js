@@ -127,5 +127,27 @@ class BookingController {
             });
         }
     }
+
+    cancelBooking = async (req, res) => {
+        try {
+            const bookingId = req.params.id;
+            const response = await this.bookingService.cancelBooking(bookingId);
+            return res.status(StatusCodes.OK).json({
+                data: response,
+                success: true,
+                message: 'Booking cancelled successfully',
+                err: {}
+            });
+        } catch (error) {
+            console.log('Controller error (cancelBooking)');
+            const status = error.statusCode || 500;
+            return res.status(status).json({
+                data: {},
+                success: false,
+                message: error.message || 'Failed to cancel booking',
+                err: error.explanation || {}
+            });
+        }
+    }
 }
 module.exports = BookingController;
