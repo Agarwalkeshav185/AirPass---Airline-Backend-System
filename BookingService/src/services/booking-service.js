@@ -56,5 +56,23 @@ class BookingService{
         }
         
     }
+
+    getBookingById = async (bookingId) => {
+        try {
+            const booking = await this.bookingRepository.getById(bookingId);
+            return booking;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    listBookings = async (filters, page, limit) => {
+        try {
+            const result = await this.bookingRepository.list(filters, page, limit);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 module.exports = BookingService;

@@ -55,5 +55,54 @@ class BookingController {
             });
         }
     }
+
+    getBooking = async (req, res) => {
+        try {
+            const bookingId = req.params.id;
+            const response = await this.bookingService.getBookingById(bookingId);
+            return res.status(StatusCodes.OK).json({
+                data: response,
+                success: true,
+                message: 'Booking fetched successfully',
+                err: {}
+            });
+        } catch (error) {
+            console.log('Controller error (getBooking)');
+            const status = error.statusCode || 500;
+            return res.status(status).json({
+                data: {},
+                success: false,
+                message: error.message || 'Failed to fetch booking',
+                err: error.explanation || {}
+            });
+        }
+    }
+
+    listBookings = async (req, res) => {
+        try {
+            const { userId, flightId, status, page = 1, limit = 10 } = req.query;
+            const filters = {};
+            if (userId) filters.userId = userId;
+            if (flightId) filters.flightId = flightId;
+            if (status) filters.status = status;
+
+            const response = await this.bookingService.listBookings(filters, page, limit);
+            return res.status(StatusCodes.OK).json({
+                data: response,
+                success: true,
+                message: 'Bookings fetched successfully',
+                err: {}
+            });
+        } catch (error) {
+            console.log('Controller error (listBookings)');
+            const status = error.statusCode || 500;
+            return res.status(status).json({
+                data: {},
+                success: false,
+                message: error.message || 'Failed to list bookings',
+                err: error.explanation || {}
+            });
+        }
+    }
 }
 module.exports = BookingController;
